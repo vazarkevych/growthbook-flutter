@@ -9,7 +9,6 @@ import 'package:growthbook_sdk_flutter/src/MultiUserMode/Model/evaluation_contex
 import 'package:growthbook_sdk_flutter/src/StickyBucketService/sticky_bucket_service.dart';
 import 'package:growthbook_sdk_flutter/src/Utils/crypto.dart';
 
-import 'package:growthbook_sdk_flutter/src/Cache/cache_directory.dart';
 import 'package:growthbook_sdk_flutter/src/Cache/caching_manager.dart';
 
 typedef VoidCallback = void Function();
@@ -94,7 +93,7 @@ class GBSDKBuilderApp {
       cachingManager: cachingManager,
       refreshHandler: refreshHandler,
       ttlSeconds: ttlSeconds,
-      gbFeatures: gbFeatures,
+      gbFeatures: gbFeatures
     );
     cachingManager.setCacheKey(apiKey);
     await cachingManager.saveContent(
@@ -140,6 +139,7 @@ class GrowthBookSDK extends FeaturesFlowDelegate {
     EvaluationContext? evaluationContext,
     BaseClient? client,
     CacheRefreshHandler? refreshHandler,
+    required int ttlSeconds,
     GBFeatures? gbFeatures,
     SavedGroupsValues? savedGroups,
     required CachingManager cachingManager
@@ -157,13 +157,14 @@ class GrowthBookSDK extends FeaturesFlowDelegate {
     _attributeOverrides = {} {
 
       _featureViewModel = FeatureViewModel(
-      delegate: this,
-      source: FeatureDataSource(context: _context, client: _baseClient),
-      encryptionKey: _context.encryptionKey ?? "",
-      backgroundSync: _context.backgroundSync,
-    );
-    autoRefresh();
-    }
+        manager: cachingManager,
+        delegate: this,
+        source: FeatureDataSource(context: _context, client: _baseClient),
+        encryptionKey: _context.encryptionKey ?? "",
+        backgroundSync: _context.backgroundSync,
+      );
+      autoRefresh();
+      }
     
     
     final GBContext _context;
@@ -261,7 +262,7 @@ class GrowthBookSDK extends FeaturesFlowDelegate {
       refreshForRemoteEval();
     } else {
       log(context.getFeaturesURL().toString());
-      await _featureViewModel.fetchFeatures(context.getFeaturesURL());
+      await featureViewModel.fetchFeatures(context.getFeaturesURL());
     }
   }
 
@@ -402,7 +403,7 @@ class GrowthBookSDK extends FeaturesFlowDelegate {
       attributes: _evaluationContext.userContext.attributes ?? {},
       forcedFeatures: _forcedFeatures,
       forcedVariations:
-          _evaluationContext?.userContext.forcedVariationsMap ?? {},
+          _evaluationContext.userContext.forcedVariationsMap ?? {},
     );
 
     await _featureViewModel.fetchFeatures(

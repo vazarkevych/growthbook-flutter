@@ -18,7 +18,6 @@ abstract class CacheDirectoryWrapper {
 }
 
 class DefaultCacheDirectoryWrapper implements CacheDirectoryWrapper {
-  @override
   CacheDirectoryType cacheDirectory;
 
   String? customCachePath;
