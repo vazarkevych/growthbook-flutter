@@ -34,9 +34,9 @@ class LocalStorageStickyBucketService extends StickyBucketService {
       if (localStorage != null) {
         final data = await localStorage!.getContent(fileName: '$prefix$key');
         if (data != null) {
-          String jsonString = utf8.decode(data);
-          Map<String, dynamic> jsonMap = json.decode(jsonString);
-
+          // Use generated method directly with proper error handling
+          final jsonString = utf8.decode(data);
+          final jsonMap = jsonDecode(jsonString) as Map<String, dynamic>;
           doc = StickyAssignmentsDocument.fromJson(jsonMap);
         }
       }
@@ -51,7 +51,7 @@ class LocalStorageStickyBucketService extends StickyBucketService {
     final key = '${doc.attributeName}||${doc.attributeValue}';
     try {
       if (localStorage != null) {
-        final content = utf8Encoder.convert(json.encode(doc.toJson()));
+        final content = utf8Encoder.convert(jsonEncode(doc.toJson()));
         localStorage!.saveContent(fileName: '$prefix$key', content: content);
       }
     } catch (e) {
@@ -60,16 +60,19 @@ class LocalStorageStickyBucketService extends StickyBucketService {
   }
 
   @override
-  Future<Map<StickyAttributeKey, StickyAssignmentsDocument>> getAllAssignments(
-      Map<String, String> attributes) async {
-    Map<String, StickyAssignmentsDocument> docs = {};
-    attributes.forEach((key, value) async {
-      var doc = await getAssignments(key, value);
-      if (doc != null) {
-        String docKey = '${doc.attributeName}||${doc.attributeValue}';
-        docs[docKey] = doc;
-      }
-    });
-    return docs;
+Future<Map<StickyAttributeKey, StickyAssignmentsDocument>> getAllAssignments(
+    Map<String, String> attributes) async {
+  final docs = <StickyAttributeKey, StickyAssignmentsDocument>{};
+
+  for (final entry in attributes.entries) {
+    final doc = await getAssignments(entry.key, entry.value);
+    if (doc != null) {
+      final docKey = '${doc.attributeName}||${doc.attributeValue}';
+      docs[docKey] = doc;
+    }
   }
+
+  return docs;
+}
+
 }
