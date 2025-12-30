@@ -146,6 +146,7 @@ void main() {
           'concurrent fetchFeatures calls should only trigger one network call',
           () async {
         featureViewModel = FeatureViewModel(
+          manager: cachingManager,
           encryptionKey: testApiKey,
           delegate: dataSourceMock,
           source: FeatureDataSource(
