@@ -99,12 +99,10 @@ void main() {
         client: client,
         growthBookTrackingCallBack: (trackData) {},
         backgroundSync: false,
-      )
-          .setRefreshHandler((refreshHandler) => refreshHandler = isRefreshed)
-          .initialize();
-      final featureValue = sdk.feature('fwrfewrfe');
+      ).setRefreshHandler((refreshHandler) => refreshHandler = isRefreshed).initialize();
+      final featureValue = sdk.feature('some-feature');
       expect(featureValue.source, GBFeatureSource.unknownFeature);
-      final result = sdk.run(GBExperiment(key: "fwrfewrfe"));
+      final result = sdk.run(GBExperiment(key: "some-feature"));
       expect(result.variationID, 0);
       manager.clearCache();
     });
@@ -221,10 +219,8 @@ void main() {
               force: 'force',
               tracks: [
                 GBTrack(
-                  featureResult: GBFeatureResult(
-                      experiment: GBExperiment(key: 'testExperimentKey'),
-                      experimentResult: GBExperimentResult(
-                          key: 'testExperimentResultKey', inExperiment: true)),
+                  experiment: GBExperiment(key: 'testExperimentKey'),
+                  result: GBExperimentResult(key: 'testExperimentResultKey', inExperiment: true),
                 ),
               ],
             ),
