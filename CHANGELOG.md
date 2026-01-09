@@ -6,6 +6,44 @@
 * **feature_viewmodel:** implement single-flight for feature fetch ([5bbeb13](https://github.com/growthbook/growthbook-flutter/commit/5bbeb137cd3c8ec69b6f1b7526f1eaef769def4a))
 * growthbook feth/refresh logic update ([ff76f2a](https://github.com/growthbook/growthbook-flutter/commit/ff76f2aeec4a39b02d444fde34b1eead427eb986))
 
+## [5.0.0](https://github.com/vazarkevych/growthbook-flutter/compare/v4.2.0...v5.0.0) (2026-01-09)
+
+
+### ⚠ BREAKING CHANGES
+
+* include .g.dart files in published packages
+
+### Features
+
+* adjust dependencies for alpha release compatible with Flutter 3… ([1b084c9](https://github.com/vazarkevych/growthbook-flutter/commit/1b084c9c0c11d5ab2176433b7fa8c29a94dde6b9))
+* adjust dependencies for alpha release compatible with Flutter 3.22.3 ([d97777d](https://github.com/vazarkevych/growthbook-flutter/commit/d97777dd5fc23154749ca4ef08ba0fd1f47737ac))
+* Implement ETag caching ([#132](https://github.com/vazarkevych/growthbook-flutter/issues/132)) ([0c86fb5](https://github.com/vazarkevych/growthbook-flutter/commit/0c86fb5ed93d14a638ae5c997c931e3dcdae5881))
+
+
+### Bug Fixes
+
+* add setup, build_runner to publish workflow ([963503c](https://github.com/vazarkevych/growthbook-flutter/commit/963503c4a93c7f5d752a469891f67ba950c84fcf))
+* analyzer issues ([226ee7f](https://github.com/vazarkevych/growthbook-flutter/commit/226ee7f55b9fde8a8a24927e7f3b944197a96710))
+* bug fixes ([b0fe046](https://github.com/vazarkevych/growthbook-flutter/commit/b0fe046aa6ccb9eebc84988335839c28c02c2ef8))
+* bug fixes for eval & sticky bucketing ([d85d4dd](https://github.com/vazarkevych/growthbook-flutter/commit/d85d4dd4f629510a5ae89c396753dd967fa924d3))
+* detached HEAD ([f8264d9](https://github.com/vazarkevych/growthbook-flutter/commit/f8264d97ef771d15777f94beb8828484b820e9ff))
+* equal to condition for string evaluation ([f1ddec9](https://github.com/vazarkevych/growthbook-flutter/commit/f1ddec9560698df0cc27887ad7071c525cbf36bb))
+* evalConditionValue ([a9bd601](https://github.com/vazarkevych/growthbook-flutter/commit/a9bd6017dba0f464b948f56202145179c09d8e01))
+* **feature_viewmodel:** implement single-flight for feature fetch ([5bbeb13](https://github.com/vazarkevych/growthbook-flutter/commit/5bbeb137cd3c8ec69b6f1b7526f1eaef769def4a))
+* **feature_viewmodel:** implement single-flight for feature fetch ([721b2c4](https://github.com/vazarkevych/growthbook-flutter/commit/721b2c42e4a46a5bdeabbcc0f40005621f320a10))
+* growthbook feth/refresh logic update ([ff76f2a](https://github.com/vazarkevych/growthbook-flutter/commit/ff76f2aeec4a39b02d444fde34b1eead427eb986))
+* include .g.dart files in published packages ([f2f64fe](https://github.com/vazarkevych/growthbook-flutter/commit/f2f64fea1c22c427639bb94580c5f72702a1ace3))
+* include .g.dart files in published packages ([f2f64fe](https://github.com/vazarkevych/growthbook-flutter/commit/f2f64fea1c22c427639bb94580c5f72702a1ace3))
+* include .g.dart files in published packages ([ef12356](https://github.com/vazarkevych/growthbook-flutter/commit/ef12356baf41a8da3f9f59abafe02ca4ea67ca7c))
+* release template  ([33af84a](https://github.com/vazarkevych/growthbook-flutter/commit/33af84a6f35a98a9fb85a96ce10b9c2e085b8147))
+* string base comparison ([36771ef](https://github.com/vazarkevych/growthbook-flutter/commit/36771ef3f38751e12ec412b610f18bafa11d94ee))
+* string comparision ([cfcb68e](https://github.com/vazarkevych/growthbook-flutter/commit/cfcb68eb180729d5a439feebe829cbdd873cc000))
+* string evaluation ([aa027b1](https://github.com/vazarkevych/growthbook-flutter/commit/aa027b15af332acc6d7b236b1ddb1e4d4f979a4a))
+* type conversions ([4324001](https://github.com/vazarkevych/growthbook-flutter/commit/4324001ad1d1cbf3839eec05cc50ae9d33f3bf88))
+* update dart SDK constraint to &gt;=3.3.0 ([00973d7](https://github.com/vazarkevych/growthbook-flutter/commit/00973d7d473a1a675e2adc4362ff3b6e71b3ea59))
+* update Flutter version to 3.24.0 ([c34afb5](https://github.com/vazarkevych/growthbook-flutter/commit/c34afb5698b3c651ff84b32a4426393a4e60f8bf))
+* update Flutter version to 3.27.0 and upgrade build_runner to ^2.4.14 ([cfcc146](https://github.com/vazarkevych/growthbook-flutter/commit/cfcc146d616359a0bcb67ec393d9b188c8ffdbed))
+
 ## [4.2.0](https://github.com/growthbook/growthbook-flutter/compare/v4.1.1...v4.2.0) (2026-01-06)
 
 
