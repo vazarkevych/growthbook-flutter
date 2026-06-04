@@ -4,6 +4,7 @@ import 'dart:developer';
 import 'package:dio/dio.dart';
 import 'package:growthbook_sdk_flutter/src/Network/lru_etag_cache.dart';
 import 'package:growthbook_sdk_flutter/src/Network/sse_event_transformer.dart';
+import 'package:growthbook_sdk_flutter/src/Network/sse_retry_manager.dart';
 
 typedef OnSuccess = void Function(Map<String, dynamic> onSuccess);
 typedef OnError = void Function(Object error, StackTrace stackTrace);
@@ -43,6 +44,8 @@ class DioClient extends BaseClient {
 
   final _featuresRegex = RegExp(r'.*/api/features/[^/]+');
 
+  final SSERetryManager _retryManager = SSERetryManager();
+
   Future<void> listenAndRetry({
     required String url,
     required OnSuccess onSuccess,
@@ -56,7 +59,6 @@ class DioClient extends BaseClient {
       );
 
       final data = resp.data;
-      final statusCode = resp.statusCode;
 
       if (data is ResponseBody) {
         data.stream
@@ -68,6 +70,7 @@ class DioClient extends BaseClient {
             log('SSE event received: ${sseModel.name}');
             if (sseModel.name == "features" && lastKnownId != sseModel.id) {
               lastKnownId = sseModel.id;
+              _retryManager.reset();
               String jsonData = sseModel.data ?? "";
               Map<String, dynamic> jsonMap = jsonDecode(jsonData);
               onSuccess(jsonMap);
@@ -77,15 +80,22 @@ class DioClient extends BaseClient {
             onError(e, s);
           },
           onDone: () async {
-            log('SSE connection closed with status: $statusCode');
-            if (statusCode != null && shouldReconnect(statusCode)) {
-              log('Attempting to reconnect SSE...');
-              await listenAndRetry(
-                url: url,
-                onError: onError,
-                onSuccess: onSuccess,
-              );
+            log('SSE connection closed');
+            if (_retryManager.isMaxRetriesReached) {
+              log('SSE max retries reached, stopping reconnection');
+              onError(Exception('Max SSE reconnection retries exceeded'),
+                  StackTrace.current);
+              return;
             }
+            final delay = _retryManager.getBackoffDelay();
+            log('Reconnecting SSE in ${delay.inMilliseconds}ms (attempt ${_retryManager.currentRetry + 1}/${_retryManager.maxRetries})');
+            _retryManager.incrementRetry();
+            await Future.delayed(delay);
+            await listenAndRetry(
+              url: url,
+              onError: onError,
+              onSuccess: onSuccess,
+            );
           },
         );
       }
@@ -93,10 +103,6 @@ class DioClient extends BaseClient {
       log('SSE connection error: $error');
       onError(error, StackTrace.current);
     }
-  }
-
-  bool shouldReconnect(int statusCode) {
-    return statusCode >= 200 && statusCode < 300;
   }
 
   @override
