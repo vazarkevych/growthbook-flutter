@@ -77,7 +77,16 @@ class DioClient extends BaseClient {
             }
           },
           onError: (dynamic e, dynamic s) async {
-            onError(e, s);
+            log('SSE stream error: $e');
+            if (_retryManager.isMaxRetriesReached) {
+              onError(e, s);
+              return;
+            }
+            final delay = _retryManager.getBackoffDelay();
+            log('Reconnecting SSE after error in ${delay.inMilliseconds}ms (attempt ${_retryManager.currentRetry + 1}/${_retryManager.maxRetries})');
+            _retryManager.incrementRetry();
+            await Future.delayed(delay);
+            await listenAndRetry(url: url, onError: onError, onSuccess: onSuccess);
           },
           onDone: () async {
             log('SSE connection closed');
