@@ -137,6 +137,61 @@ void main() {
       expect(_eval(r'{"t": {"k": "v"}}', r'{"t": {"k": "v"}}'), isTrue);
     });
 
+    // Plain equality converts the attribute to the condition's type, as the
+    // reference SDK does: `value + "" === condition`, `value * 1 === condition`,
+    // `!!value === condition`. The shared spec fixtures only pair different
+    // types where the answer is false, so this went unnoticed.
+    test('plain equality converts to a string condition', () {
+      expect(_eval(r'{"id": "25"}', r'{"id": 25}'), isTrue);
+      expect(_eval(r'{"flag": "true"}', r'{"flag": true}'), isTrue);
+      expect(_eval(r'{"c": "null"}', r'{"other": "x"}'), isTrue);
+      expect(_eval(r'{"c": "US"}', r'{"other": "x"}'), isFalse);
+    });
+
+    test('plain equality converts to a number condition', () {
+      expect(_eval(r'{"age": 25}', r'{"age": "25"}'), isTrue);
+      expect(_eval(r'{"age": 25}', r'{"age": " 25 "}'), isTrue);
+      expect(_eval(r'{"n": 1}', r'{"n": true}'), isTrue);
+      expect(_eval(r'{"n": 0}', r'{"other": "x"}'), isTrue);
+      expect(_eval(r'{"age": 25}', r'{"age": "abc"}'), isFalse);
+    });
+
+    test('plain equality converts to a boolean condition', () {
+      expect(_eval(r'{"beta": true}', r'{"beta": 1}'), isTrue);
+      expect(_eval(r'{"beta": true}', r'{"beta": "x"}'), isTrue);
+      expect(_eval(r'{"beta": false}', r'{"beta": 0}'), isTrue);
+      expect(_eval(r'{"beta": false}', r'{"beta": ""}'), isTrue);
+      expect(_eval(r'{"beta": true}', r'{"beta": 0}'), isFalse);
+      // `value !== null` comes first, so an absent attribute is never
+      // false-equal
+      expect(_eval(r'{"beta": false}', r'{"other": "x"}'), isFalse);
+    });
+
+    // An array or object attribute converts too: `["x"] + ""` is "x",
+    // `[5] * 1` is 5, and an object's text is "[object Object]". A primitive
+    // condition against such an attribute used to fall through every branch
+    // to the trailing `return true` and match unconditionally.
+    test('plain equality converts array and object attributes', () {
+      expect(_eval(r'{"t": "x"}', r'{"t": ["x"]}'), isTrue);
+      expect(_eval(r'{"t": "x"}', r'{"t": ["y"]}'), isFalse);
+      expect(_eval(r'{"t": 5}', r'{"t": [5]}'), isTrue);
+      expect(_eval(r'{"t": 5}', r'{"t": {"k": 5}}'), isFalse);
+      expect(_eval(r'{"t": "x"}', r'{"t": {"k": "x"}}'), isFalse);
+    });
+
+    // Two numbers still compare exactly, so 19-digit ids are not rounded into
+    // each other.
+    test('plain equality keeps large integers exact', () {
+      expect(
+        _eval(r'{"id": 1234567890123456789}', r'{"id": 1234567890123456789}'),
+        isTrue,
+      );
+      expect(
+        _eval(r'{"id": 1234567890123456789}', r'{"id": 1234567890123456788}'),
+        isFalse,
+      );
+    });
+
     test('pair is a strict inverse for non-primitive attributes', () {
       _expectStrictInverse(r'["a"]', r'{"t": ["a"]}', expectedEq: false);
       _expectStrictInverse(r'["b"]', r'{"t": ["a"]}', expectedEq: false);

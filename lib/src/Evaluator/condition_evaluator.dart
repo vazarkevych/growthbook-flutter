@@ -216,20 +216,29 @@ class GBConditionEvaluator {
     bool inSensitive = false,
     Set<String> visited = const <String>{},
   }) {
-    // Case-insensitive equality short-circuit for strings.
-    if (inSensitive && conditionValue is String && attributeValue is String) {
-      return conditionValue.toLowerCase() == attributeValue.toLowerCase();
+    // A primitive condition converts the attribute to the condition's type
+    // before comparing, as the reference SDK does (`mongrule.ts`):
+    // `value + "" === condition` for a string, `value * 1 === condition` for a
+    // number, `!!value === condition` for a boolean. So `{"age": 25}` matches
+    // "25", and `{"beta": true}` matches 1.
+    if (conditionValue is String) {
+      final text = _jsText(attributeValue);
+      return inSensitive
+          ? text.toLowerCase() == conditionValue.toLowerCase()
+          : text == conditionValue;
     }
-    // If conditionValue is a string, number, boolean, return true if it's
-    // "equal" to attributeValue and false if not.
-    if ((conditionValue as Object?).isPrimitive &&
-        (attributeValue as Object?).isPrimitive) {
-      return conditionValue == attributeValue;
+    if (conditionValue is num) {
+      // Two numbers keep Dart's exact comparison, so ids past 2^53 are not
+      // rounded into each other
+      if (attributeValue is num) return attributeValue == conditionValue;
+      return _jsNumber(attributeValue) == conditionValue.toDouble();
     }
-
-    // Evaluate to false if attributeValue is null.
-    if (conditionValue.isPrimitive && attributeValue == null) {
-      return false;
+    if (conditionValue is bool) {
+      return attributeValue != null &&
+          _isJsTruthy(attributeValue) == conditionValue;
+    }
+    if (conditionValue == null) {
+      return attributeValue == null;
     }
 
     // If conditionValue is array, return true if it's "equal" - "equal" should
